@@ -13,6 +13,7 @@ from Modules.server.ServerBase import ServerBase
 from Vision.ColorObjectIdentifier import ColorObjectIdentifier
 from Controllers.FollowLargestObjectControler import FollowLargestObjectControler
 from Controllers.FollowClaw import FollowClawController
+from Controllers.FollowSlider import FollowSliderController
 
 import subprocess
 import sys
@@ -112,14 +113,14 @@ upper_red = np.array([40, 255, 255])
 selected_object_identifier: VisualObjectIdentifier = ColorObjectIdentifier(lower_blue, upper_blue)
 
 # controler stuff
-selected_controler: Controller = FollowLargestObjectControler(selected_HAL, selected_object_identifier)
+selected_controler: Controller = FollowSliderController(selected_HAL)
 
 selected_app = None
 if config["use_app"]:
     # Kivy opens the window if this is imported, thus why it is here.
     from Modules.App.App import App
     selected_object_identifier: ColorObjectIdentifier = ColorObjectIdentifier(lower_red, upper_red)
-    selected_controler = FollowClawController(selected_HAL,selected_object_identifier)    
+    selected_controler = FollowSliderController(selected_HAL)    
     selected_app = App(selected_controler, selected_HAL, selected_object_identifier)
 
 # Server setup

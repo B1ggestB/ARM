@@ -210,23 +210,23 @@ class FollowSliderController(Controller):
     def start(self):
         self.keep_running = True
         self.paused = True
-        xEE = 0
+        xEE = 1
         yEE = 0
         zEE = 17
         Incrementing = True
         counter = 0
-        range = (15*4)
-        while(True):
-            coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-            if(Incrementing):
+        range = (5*4) #a * b is how many times it will increment up then down(changing b depending on factor ex: 4 if icrementing by .25)
+        while(True): #loop to keep moving back and forth in one axis
+            coordinate_input(xEE,yEE,zEE,self.selected_HAL,False) #change end effector ie move the arm to specified cordinate
+            if(Incrementing): 
                 xEE += .25
             else:
                 xEE -= .25
             counter += 1
-            if (counter >= 10):
+            if (counter >= range):
                 counter = 0
                 Incrementing = not(Incrementing)
-            time.sleep(.1)
+            time.sleep(.25) #added a delay
         #self.thread = threading.Thread(target=self.thread_main)
         #self.thread.start()
     def pause_state(self,state):

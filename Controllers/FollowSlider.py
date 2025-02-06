@@ -15,17 +15,18 @@ from HALs.HAL_base import HAL_base
 from Modules.Base.ImageProducer import ImageProducer
 from Controllers.Controller import Controller
 
-def coordinate_input(x, y, z,hal,vision=False):
+def coordinate_input(x, y, z,hal,arm,vision=False):
     global mtr
     global sim
     try:
-        a1 = 5.3
-        a2 = 3.25
-        a3 = 11.4
-        a4 = 3.25
-        a5 = 5.3
-        a6 = 5
-        robot_arm1 = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        # a1 = 5.3
+        # a2 = 3.25
+        # a3 = 11.4
+        # a4 = 3.25
+        # a5 = 5.3
+        # a6 = 5
+        # robot_arm1 = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        robot_arm1 = arm
         # caluclate angles
         angles = robot_arm1.calculate_angles(sym.Matrix([x, y, z, 1]))
 
@@ -51,6 +52,8 @@ def coordinate_input(x, y, z,hal,vision=False):
             t1n = hal.get_joint(1)
             t0n = t0n + (t0deg - t0n) * .1
             t1n = t1n + (t1deg - t1n) * .1
+            
+            # print("calling the outside of reigon set joint")
             hal.set_joint(0, t0deg)
             hal.set_joint(1, t1deg)
             hal.set_joint(2, 0)
@@ -80,6 +83,9 @@ def coordinate_input(x, y, z,hal,vision=False):
 
             # theta 2 output : 0 to 180
             angle_2 =-(angles[2]-90)
+            # print("angle_base: " , angle_base)
+            # print("angle_1: " , angle_1)
+            # print("angle_2: " , angle_2)
 
             print("--------- Moving ARM ---------")
             if vision:
@@ -91,6 +97,7 @@ def coordinate_input(x, y, z,hal,vision=False):
                 hal.set_joint(0, angle_base)
                 hal.set_joint(1, angle_1)
                 hal.set_joint(2, angle_2)
+                # pass
 
     except Exception as err:
         print(f"Exeption in moving the arm (coordinate_input): {err=}, {type(err)=}")
@@ -104,6 +111,10 @@ class Three_Degree_Arm:
         self.a4 = a4
         self.a5 = a5
         self.a6 = a6
+        self.Cords = [0,0,0]
+    
+    def getCords(self):
+        return self.Cords
 
     def DH_matrix(self, theta, alpha, r, d):
         return sym.Matrix([
@@ -166,8 +177,11 @@ class Three_Degree_Arm:
             EE_position = H0_4[:3, 3]
             print('EE Position (CM):')
             # print(f'x: {float(EE_position[0].evalf()):.2f}')
+            self.Cords[0] = float(EE_position[0].evalf())
             # print(f'y: {float(EE_position[1].evalf()):.2f}')
+            self.Cords[1] = float(EE_position[1].evalf())
             # print(f'z: {float(EE_position[2].evalf()):.2f}')
+            self.Cords[2] = float(EE_position[2].evalf())
 
             theta1_deg = sym.deg(theta1.evalf())
             theta2_deg = sym.deg(theta2.evalf())
@@ -177,7 +191,8 @@ class Three_Degree_Arm:
             print(f'Base: {theta1_deg.evalf():.2f} degrees')
             print(f'1: {theta2_deg.evalf():.2f} degrees')
             print(f'2: {theta3_deg.evalf():.2f} degrees')
-            return theta1_deg, theta2_deg, theta3_deg
+            return theta1_deg, theta2_deg, theta3_deg 
+            # , EE_position
         else:
             print('This point is not feasible')
 
@@ -202,31 +217,115 @@ class FollowSliderController(Controller):
         selected_HAL.set_joint_max(0, 270) # set_base_max_degree(270)
         selected_HAL.set_joint_max(2, 75) # set_joint_2_max(75)
         
-  
+    def moveInX(self,pos = True,Increment = 1):
+        a1 = 5.3
+        a2 = 3.25
+        a3 = 11.4
+        a4 = 3.25
+        a5 = 5.3
+        a6 = 5
+        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        EEs = arm.getCords()
+        xEE = EEs[0]
+        yEE = EEs[1]
+        zEE  = EEs[2]
+        if (pos):
+            xEE += Increment
+        else:
+            xEE -= Increment
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm,False)
+        time.sleep(1)
+
+    def moveInY(self,pos = True,Increment = 1):
+        a1 = 5.3
+        a2 = 3.25
+        a3 = 11.4
+        a4 = 3.25
+        a5 = 5.3
+        a6 = 5
+        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        EEs = arm.getCords()
+        xEE = EEs[0]
+        yEE = EEs[1]
+        zEE  = EEs[2]
+        if (pos):
+            yEE += Increment
+        else:
+            yEE -= Increment
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm,False)
+        time.sleep(1)
         
+    def moveInZ(self,pos = True,Increment = 1):
+        a1 = 5.3
+        a2 = 3.25
+        a3 = 11.4
+        a4 = 3.25
+        a5 = 5.3
+        a6 = 5
+        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        EEs = arm.getCords()
+        xEE = EEs[0]
+        yEE = EEs[1]
+        zEE  = EEs[2]
+        if (pos):
+            zEE += Increment
+        else:
+            zEE -= Increment
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm,False)
+        time.sleep(1)
+
     def thread_main(self):
         pass
 
     def start(self):
         self.keep_running = True
         self.paused = True
-        xEE = 1
-        yEE = 0
-        zEE = 17
-        Incrementing = True
-        counter = 0
-        range = (5*4) #a * b is how many times it will increment up then down(changing b depending on factor ex: 4 if icrementing by .25)
-        while(True): #loop to keep moving back and forth in one axis
-            coordinate_input(xEE,yEE,zEE,self.selected_HAL,False) #change end effector ie move the arm to specified cordinate
-            if(Incrementing): 
-                xEE += .25
-            else:
-                xEE -= .25
-            counter += 1
-            if (counter >= range):
-                counter = 0
-                Incrementing = not(Incrementing)
-            time.sleep(.25) #added a delay
+        angle_0 = 0
+        angle_1 = 0
+        angle_2 = 45
+        xEE = 10
+        yEE = 10
+        zEE = 15
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(11)
+        xEE += 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(1)
+        xEE -= 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(1)
+        yEE += 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(1)
+        yEE -= 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(1)
+        zEE += 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        time.sleep(1)
+        zEE -= 1
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # Incrementing = True
+        # counter = 0
+        # range = (20) #a * b is how many times it will increment up then down(changing b depending on factor ex: 4 if icrementing by .25)
+        # while(True): #loop to keep moving back and forth in one axis
+        #     time.sleep(1) #added a delay
+        #     coordinate_input(xEE,yEE,zEE,self.selected_HAL,False) #change end effector ie move the arm to specified cordinate
+        #     # self.selected_HAL.set_joint(0, angle_0)
+        #     # self.selected_HAL.set_joint(1, angle_1)
+        #     # self.selected_HAL.set_joint(2, angle_2)
+        #     if(Incrementing): 
+        #         zEE += .25
+        #         # angle_2 += 5
+        #     else:
+        #         zEE -= .25
+        #         # angle_2 -= 5
+
+        #     counter += 1
+        #     if (counter >= range):
+        #         counter = 0
+        #         Incrementing = not(Incrementing)
+            
         #self.thread = threading.Thread(target=self.thread_main)
         #self.thread.start()
     def pause_state(self,state):

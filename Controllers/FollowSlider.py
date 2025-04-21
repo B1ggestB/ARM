@@ -19,12 +19,12 @@ def coordinate_input(x, y, z,hal,arm,vision=False):
     global mtr
     global sim
     try:
-        # a1 = 5.3
-        # a2 = 3.25
-        # a3 = 11.4
-        # a4 = 3.25
-        # a5 = 5.3
-        # a6 = 5
+        a1 = 5.3
+        a2 = 3.25
+        a3 = 11.4
+        a4 = 3.25
+        a5 = 5.3
+        a6 = 5
         # robot_arm1 = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
         robot_arm1 = arm
         # caluclate angles
@@ -201,7 +201,6 @@ class FollowSliderController(Controller):
         self.selected_HAL: HAL_base = selected_HAL
         #self.vision: VisualObjectIdentifier = vision
         #self.imageGetter: ImageProducer = selected_HAL
-        
         self._task = None  # To keep track of the running task
         self.keep_running = False
         self.thread = None
@@ -217,14 +216,8 @@ class FollowSliderController(Controller):
         selected_HAL.set_joint_max(0, 270) # set_base_max_degree(270)
         selected_HAL.set_joint_max(2, 75) # set_joint_2_max(75)
         
-    def moveInX(self,pos = True,Increment = 1):
-        a1 = 5.3
-        a2 = 3.25
-        a3 = 11.4
-        a4 = 3.25
-        a5 = 5.3
-        a6 = 5
-        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+    def moveInX(self, a, pos = True,Increment = 1):
+        arm = a
         EEs = arm.getCords()
         xEE = EEs[0]
         yEE = EEs[1]
@@ -236,14 +229,8 @@ class FollowSliderController(Controller):
         coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm,False)
         time.sleep(1)
 
-    def moveInY(self,pos = True,Increment = 1):
-        a1 = 5.3
-        a2 = 3.25
-        a3 = 11.4
-        a4 = 3.25
-        a5 = 5.3
-        a6 = 5
-        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+    def moveInY(self,a, pos = True,Increment = 1,):
+        arm = a
         EEs = arm.getCords()
         xEE = EEs[0]
         yEE = EEs[1]
@@ -255,14 +242,8 @@ class FollowSliderController(Controller):
         coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm,False)
         time.sleep(1)
         
-    def moveInZ(self,pos = True,Increment = 1):
-        a1 = 5.3
-        a2 = 3.25
-        a3 = 11.4
-        a4 = 3.25
-        a5 = 5.3
-        a6 = 5
-        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+    def moveInZ(self, a, pos = True,Increment = 1):
+        arm = a
         EEs = arm.getCords()
         xEE = EEs[0]
         yEE = EEs[1]
@@ -280,31 +261,47 @@ class FollowSliderController(Controller):
     def start(self):
         self.keep_running = True
         self.paused = True
-        angle_0 = 0
-        angle_1 = 0
-        angle_2 = 45
         xEE = 10
         yEE = 10
         zEE = 15
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        a1 = 5.3
+        a2 = 3.25
+        a3 = 11.4
+        a4 = 3.25
+        a5 = 5.3
+        a6 = 5
+        arm = Three_Degree_Arm(a1, a2, a3, a4, a5, a6)
+        increment = 1
+        pos = True
+        neg = False
+
+        coordinate_input(xEE,yEE,zEE,self.selected_HAL,arm, False)
         time.sleep(11)
-        xEE += 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-        time.sleep(1)
-        xEE -= 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-        time.sleep(1)
-        yEE += 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-        time.sleep(1)
-        yEE -= 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-        time.sleep(1)
-        zEE += 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
-        time.sleep(1)
-        zEE -= 1
-        coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+
+        self.moveInX(arm, pos, increment)
+        self.moveInX(arm, neg, increment)
+        self.moveInY(arm, pos, increment)
+        self.moveInY(arm, neg, increment)
+        self.moveInZ(arm, pos, increment)
+        self.moveInZ(arm, neg, increment)
+        
+        # xEE += 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # time.sleep(1)
+        # xEE -= 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # time.sleep(1)
+        # yEE += 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # time.sleep(1)
+        # yEE -= 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # time.sleep(1)
+        # zEE += 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
+        # time.sleep(1)
+        # zEE -= 1
+        # coordinate_input(xEE,yEE,zEE,self.selected_HAL,False)
         # Incrementing = True
         # counter = 0
         # range = (20) #a * b is how many times it will increment up then down(changing b depending on factor ex: 4 if icrementing by .25)
